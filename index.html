@@ -1,152 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rahul WinKey - Penalty Predictor</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #ff9933, #ffffff, #138808);
-      background-size: 400% 400%;
-      animation: gradient 10s ease infinite;
-      color: #222;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Rahul WinKey — Penalty Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --saffron:#ff7a00;
+    --green:#0cb86a;
+    --bg:#07121a;
+    --card:#ffffff;
+    --muted:#5c6b73;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(800px 400px at 10% 10%, rgba(255,122,0,.08), transparent 20%),
+      radial-gradient(800px 400px at 90% 90%, rgba(12,184,106,.06), transparent 20%),
+      linear-gradient(180deg,#f6f7f8,#e9eef0);
+    font-family:Inter,system-ui,Arial,sans-serif;
+    color:#111;
+    padding:20px;
+  }
 
-    @keyframes gradient {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
+  .wrap{
+    width:100%;
+    max-width:480px;
+  }
 
-    .container {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 30px 20px;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      max-width: 420px;
-      width: 100%;
-    }
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.98));
+    border-radius:18px;
+    padding:18px;
+    box-shadow: 0 10px 30px rgba(10,20,30,.12);
+    overflow:hidden;
+  }
 
-    .flag {
-      width: 60px;
-      margin-bottom: 10px;
-    }
+  .top{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    justify-content:center;
+    flex-direction:column;
+  }
+  .flag{ width:56px; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.08); }
+  .title{
+    font-weight:800;
+    font-size:22px;
+    color:var(--saffron);
+    margin-top:4px;
+  }
+  .sub{ color:var(--muted); font-size:13px; margin-bottom:10px; }
 
-    h1 {
-      font-size: 24px;
-      margin: 10px 0 20px;
-      color: #ff6600;
-    }
+  /* FIELD & GOAL */
+  .field-wrap{
+    position:relative;
+    margin:12px auto 4px;
+    width:100%;
+    height:320px;
+    max-height:60vh;
+    border-radius:12px;
+    overflow:hidden;
+    background-image: linear-gradient(180deg,#0aa04d 0%, #0b8a45 100%);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    padding:18px;
+  }
 
-    .goal {
-      display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(3, 80px);
-      gap: 10px;
-      justify-content: center;
-      margin: 20px auto;
-    }
+  /* Goal board */
+  .goal {
+    position:relative;
+    width:86%;
+    max-width:380px;
+    height:160px;
+    background: linear-gradient(180deg,#e9f7ef,#dff1e6);
+    border:6px solid #f1f1f1;
+    box-shadow:0 6px 18px rgba(0,0,0,.08) inset;
+    border-radius:6px;
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap:6px;
+    padding:8px;
+    align-items:center;
+    justify-items:center;
+  }
 
-    .spot {
-      background: #e0e0e0;
-      border: 2px solid #aaa;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: bold;
-      color: #555;
-      transition: background 0.3s, color 0.3s;
-    }
+  .zone{
+    position:relative;
+    width:94%;
+    height:90%;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: rgba(255,255,255,0.85);
+    color:#444;
+    font-weight:700;
+    box-shadow:0 4px 10px rgba(0,0,0,.06);
+    transition:transform .28s cubic-bezier(.2,.9,.2,1), box-shadow .2s;
+  }
+  .zone.small { font-size:13px; }
+  .zone.big { font-size:15px; }
 
-    .active {
-      background: #ff6600 !important;
-      color: white !important;
-    }
+  .zone.active{
+    background: linear-gradient(180deg,var(--saffron), var(--green));
+    color:#fff;
+    transform:scale(1.06) translateY(-6px);
+    box-shadow: 0 18px 40px rgba(0,0,0,.16);
+  }
 
-    .btn {
-      background-color: #ff6600;
-      color: white;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      width: 100%;
-      margin-top: 20px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-    }
+  /* ball and kick area */
+  .kick-area{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:16px;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+  }
+  .ball{
+    width:46px; height:46px;
+    background-image:url('https://i.imgur.com/1P4GQ2J.png');
+    background-size:cover;
+    border-radius:50%;
+    box-shadow:0 8px 18px rgba(0,0,0,.25);
+    pointer-events:auto;
+    cursor:pointer;
+    transform-origin:center;
+    transition:transform .12s;
+  }
 
-    .btn:hover {
-      background-color: #e05500;
-    }
+  .controls{
+    margin-top:12px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
 
-    .coefficient {
-      font-size: 22px;
-      margin-top: 15px;
-      font-weight: bold;
-      color: #138808;
-    }
+  .stake {
+    display:flex;
+    gap:8px;
+    align-items:center;
+    background:#fff;
+    padding:8px;
+    border-radius:10px;
+    box-shadow:0 6px 18px rgba(0,0,0,.04);
+    border:1px solid rgba(0,0,0,.06);
+  }
+  .stake input{
+    width:90px; padding:8px; border:none; outline:none; font-weight:700; font-size:15px;
+  }
 
-    .footer {
-      margin-top: 25px;
-      font-size: 13px;
-      color: #333;
-      opacity: 0.8;
-    }
-  </style>
+  .btn{
+    padding:10px 14px;
+    background: linear-gradient(90deg,var(--saffron), var(--green));
+    border:none; color:#071018; font-weight:900; border-radius:10px; cursor:pointer;
+    box-shadow:0 10px 28px rgba(255,122,0,.12);
+    transition:transform .08s ease;
+  }
+  .btn:active{ transform:scale(.98) }
+
+  .info{
+    margin-top:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;
+    font-weight:700;
+  }
+  .current-win{ color:#0b8a45; font-size:18px; }
+  .multiplier{ color:#d35400; font-weight:900; font-size:16px; }
+
+  .meta{
+    margin-top:14px; text-align:center; color:#6d7780; font-size:13px;
+  }
+
+  /* responsive */
+  @media (max-width:420px){
+    .field-wrap{ height:54vh; padding:12px; }
+    .goal{ height:150px; }
+    .ball{ width:44px; height:44px; }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <img src="https://flagcdn.com/w320/in.png" alt="India Flag" class="flag">
-    <h1>Rahul WinKey - Penalty Predictor</h1>
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <img class="flag" src="https://flagcdn.com/w320/in.png" alt="India">
+        <div class="title">Rahul WinKey</div>
+        <div class="sub">Penalty Predictor — Made for India • INR</div>
+      </div>
 
-    <div class="goal" id="goal">
-      <div class="spot">×2</div>
-      <div class="spot">×4</div>
-      <div class="spot">×8</div>
-      <div class="spot">×12</div>
-      <div class="spot">×16</div>
-      <div class="spot">×20</div>
-      <div class="spot">×24</div>
-      <div class="spot">×28</div>
-      <div class="spot">×32</div>
+      <div class="field-wrap" aria-hidden="false">
+        <!-- goal grid with zones -->
+        <div class="goal" id="goal">
+          <!-- We'll set multipliers visually - choose distribution to match photo style -->
+          <div class="zone small" data-mult="2">x2</div>
+          <div class="zone small" data-mult="4">x4</div>
+          <div class="zone small" data-mult="12">x12</div>
+
+          <div class="zone small" data-mult="8">x8</div>
+          <div class="zone big"   data-mult="16">x16</div>
+          <div class="zone small" data-mult="20">x20</div>
+
+          <div class="zone small" data-mult="24">x24</div>
+          <div class="zone small" data-mult="28">x28</div>
+          <div class="zone small" data-mult="32">x32</div>
+        </div>
+
+        <!-- kick area (ball at bottom center) -->
+        <div class="kick-area" aria-hidden="true">
+          <div id="ball" class="ball" title="Kick"></div>
+        </div>
+      </div>
+
+      <!-- controls -->
+      <div class="controls" style="justify-content:space-between; margin-top:12px;">
+        <div class="stake" title="Bet stake (INR)">
+          <div style="font-size:12px; color:#6d7780;">Stake</div>
+          <input id="stake" type="number" min="10" step="10" value="100">
+        </div>
+
+        <div>
+          <button id="kickBtn" class="btn">Kick</button>
+        </div>
+      </div>
+
+      <div class="info">
+        <div class="current-win">Win: <span id="winAmount">0</span> INR</div>
+        <div class="multiplier">Multiplier: <span id="multVal">x1</span></div>
+      </div>
+
+      <div class="meta">Made by HackerHouse • Bengaluru</div>
     </div>
-
-    <button class="btn" onclick="kick()">Kick</button>
-
-    <div class="coefficient" id="coef">Current: ×1</div>
-
-    <div class="footer">Made by HackerHouse • Bengaluru</div>
   </div>
 
-  <script>
-    let currentCoef = 1;
-    function kick() {
-      // сброс предыдущего выделения
-      document.querySelectorAll('.spot').forEach(el => el.classList.remove('active'));
+<script>
+  // basic state
+  const zones = Array.from(document.querySelectorAll('.zone'));
+  const ball = document.getElementById('ball');
+  const kickBtn = document.getElementById('kickBtn');
+  const stakeInput = document.getElementById('stake');
+  const winEl = document.getElementById('winAmount');
+  const multEl = document.getElementById('multVal');
 
-      // случайная ячейка
-      const spots = document.querySelectorAll('.spot');
-      const randomIndex = Math.floor(Math.random() * spots.length);
-      spots[randomIndex].classList.add('active');
+  let currentMultiplier = 1;
+  let isAnimating = false;
+  let totalWin = 0;
 
-      // увеличить коэффициент
-      currentCoef *= 2;
-      if (currentCoef > 32) currentCoef = 32;
-      document.getElementById("coef").textContent = "Current: ×" + currentCoef;
-    }
-  </script>
+  // helper: get absolute center coords of an element
+  function centerOf(el){
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width/2, y: r.top + r.height/2 };
+  }
+
+  // reset zone highlights
+  function resetZones(){ zones.forEach(z=>z.classList.remove('active')); }
+
+  // animate ball from its current position to target zone
+  function flyBallTo(targetEl){
+    if(isAnimating) return;
+    isAnimating = true;
+    resetZones();
+
+    // compute start (ball) and end (zone center) relative to document
+    const ballRect = ball.getBoundingClientRect();
+    const start = { x: ballRect.left + ballRect.width/2, y: ballRect.top + ballRect.height/2 };
+    const targetRect = targetEl.getBoundingClientRect();
+    const end = { x: targetRect.left + targetRect.width/2, y: targetRect.top + targetRect.height/2 };
+
+    // compute translation deltas relative to ball's current offsetParent
+    const parentRect = ball.offsetParent.getBoundingClientRect();
+    const startLocal = { x: start.x - parentRect.left - ballRect.width/2, y: start.y - parentRect.top - ballRect.height/2 };
+    const endLocal = { x: end.x - parentRect.left - ballRect.width/2, y: end.y - parentRect.top - ballRect.height/2 };
+
+    // apply CSS transform to animate
+    // set initial transform if none
+    ball.style.transition = 'transform 900ms cubic-bezier(.22,.9,.18,1), width 120ms, height 120ms';
+    // small squash before launch
+    ball.style.transform = 'translate(' + (startLocal.x - startLocal.x) + 'px,' + (startLocal.y - startLocal.y + 8) + 'px) scale(0.95)';
+
+    // slight delay to show squash
+    requestAnimationFrame(() => {
+      setTimeout(()=> {
+        // move
+        ball.style.transform = `translate(${endLocal.x}px, ${endLocal.y - 20}px) scale(0.8)`;
+      }, 80);
+    });
+
+    // show trail: highlight zone when ball arrives
+    setTimeout(() => {
+      targetEl.classList.add('active');
+    }, 900);
+
+    // when animation ends, bounce ball a bit and update multiplier/win
+    setTimeout(()=> {
+      // bounce & disappear (simulate ball hitting)
+      ball.style.transform = `translate(${endLocal.x}px, ${endLocal.y}px) scale(0.6)`;
+    }, 1000);
+
+    setTimeout(()=> {
+      // reset ball back to base position (transition)
+      ball.style.transition = 'transform 600ms cubic-bezier(.2,.9,.2,1)';
+      ball.style.transform = 'translate(0px,0px) scale(1)';
+      // update multiplier and win amount
+      const m = Number(targetEl.dataset.mult);
+      currentMultiplier = Math.min(currentMultiplier * m, 9999999); // prevent runaway
+      const stake = Math.max(Number(stakeInput.value)||0, 0);
+      totalWin = Math.round((stake * currentMultiplier) * 100) / 100;
+      multEl.textContent = 'x' + currentMultiplier;
+      winEl.textContent = totalWin.toFixed(2);
+      isAnimating = false;
+    }, 1700);
+  }
+
+  // choose a random zone (weighted if needed). For now uniform random.
+  function pickZone(){
+    const idx = Math.floor(Math.random() * zones.length);
+    return zones[idx];
+  }
+
+  // Kick handler
+  kickBtn.addEventListener('click', ()=>{
+    if(isAnimating) return;
+    resetZones();
+
+    // pick zone & fly
+    const zone = pickZone();
+    flyBallTo(zone);
+  });
+
+  // Allow tapping ball to kick
+  ball.addEventListener('click', ()=> kickBtn.click());
+
+  // initial display
+  multEl.textContent = 'x1';
+  winEl.textContent = '0.00';
+</script>
 </body>
 </html>
