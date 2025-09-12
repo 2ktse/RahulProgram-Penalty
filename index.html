@@ -1,131 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rahul WinKey • Penalty Predictor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Penalty Predictor</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: url('https://i.ibb.co/L8QXgGJ/football-field-bg.jpg') no-repeat center center/cover;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
       color: white;
-      text-align: center;
     }
-
-    h1 {
-      margin-bottom: 10px;
-      color: #ffcc00;
-      text-shadow: 2px 2px 4px #000;
-    }
-
-    .goal {
+    .game {
       position: relative;
-      width: 300px;
-      height: 200px;
-      background: url('https://i.ibb.co/Jn6j6Lt/football-goal.png') no-repeat center/contain;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 5px;
+      width: 400px;
+      height: 600px;
+      background: url('A_2D_digital_illustration_depicts_a_soccer_goal_ta.png') no-repeat center/cover;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+      overflow: hidden;
     }
-
     .target {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.8);
       display: flex;
       justify-content: center;
       align-items: center;
       font-weight: bold;
-      color: black;
-      background: rgba(255, 255, 255, 0.7);
-      border-radius: 50%;
-      cursor: pointer;
-      transition: transform 0.3s, background 0.3s;
+      color: #ff4747;
+      font-size: 18px;
+      display: none;
     }
-
-    .target.active {
-      background: gold;
-      transform: scale(1.2);
-    }
-
-    .ball {
-      margin-top: 20px;
-      width: 40px;
-      height: 40px;
-      background: url('https://i.ibb.co/0Y0kTQk/football-ball.png') no-repeat center/contain;
-    }
-
-    .btn {
-      margin-top: 20px;
-      padding: 12px 25px;
-      font-size: 16px;
-      font-weight: bold;
-      background: #ffcc00;
+    .kick-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ff4747;
       border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .btn:hover {
-      background: #e6b800;
-    }
-
-    .result {
-      margin-top: 15px;
+      padding: 15px 40px;
       font-size: 20px;
       font-weight: bold;
-      color: #00ff88;
-      text-shadow: 1px 1px 3px black;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
     }
-
-    footer {
-      margin-top: 25px;
-      font-size: 13px;
-      color: #ddd;
+    .kick-btn:hover {
+      background: #ff2424;
+    }
+    .multiplier {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 22px;
+      font-weight: bold;
+      background: rgba(0,0,0,0.5);
+      padding: 8px 16px;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <h1>Rahul WinKey • Penalty Predictor</h1>
-  <div class="goal" id="goal">
-    <div class="target">X2</div>
-    <div class="target">X3</div>
-    <div class="target">X5</div>
-    <div class="target">X8</div>
-    <div class="target">X10</div>
-    <div class="target">X12</div>
-    <div class="target">X15</div>
-    <div class="target">X20</div>
-    <div class="target">X25</div>
+  <div class="game">
+    <div class="multiplier" id="multiplier">x2</div>
+    <div class="target" id="target"></div>
+    <button class="kick-btn" onclick="kick()">Kick</button>
   </div>
-  <div class="ball"></div>
-  <button class="btn" onclick="kick()">Kick</button>
-  <div class="result" id="result">⚽ Ready to kick!</div>
-
-  <footer>Made by HackerHouse • Bengaluru</footer>
 
   <script>
-    const targets = document.querySelectorAll('.target');
-    const result = document.getElementById('result');
+    const multipliers = ["x2","x4","x12","x20","x32"];
+    let currentStep = 0;
 
-    function kick() {
-      // очистка предыдущих
-      targets.forEach(t => t.classList.remove('active'));
+    // позиции 9 мишеней (примерные координаты для фона)
+    const positions = [
+      {top:"100px", left:"70px"},
+      {top:"100px", left:"170px"},
+      {top:"100px", left:"270px"},
+      {top:"200px", left:"70px"},
+      {top:"200px", left:"170px"},
+      {top:"200px", left:"270px"},
+      {top:"300px", left:"70px"},
+      {top:"300px", left:"170px"},
+      {top:"300px", left:"270px"},
+    ];
 
-      // случайная цель
-      const index = Math.floor(Math.random() * targets.length);
-      const target = targets[index];
+    function kick(){
+      if(currentStep >= multipliers.length) return;
 
-      // подсветка
-      target.classList.add('active');
+      const target = document.getElementById("target");
+      const multiplierText = document.getElementById("multiplier");
 
-      // вывод результата
-      result.textContent = "🎯 Correct shot → " + target.textContent;
+      // выбираем случайную мишень
+      const pos = positions[Math.floor(Math.random() * positions.length)];
+      target.style.top = pos.top;
+      target.style.left = pos.left;
+      target.style.display = "flex";
+      target.textContent = "🎯";
+
+      multiplierText.textContent = multipliers[currentStep];
+      currentStep++;
     }
   </script>
 </body>
