@@ -1,113 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Penalty Predictor</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penalty Predictor - Rahul WinKey</title>
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #000;
+      background: url("https://raw.githubusercontent.com/username/repository/main/c3d9fd6b-0795-48a5-a6fd-4bf30c8c4eba.png") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
-      color: white;
+      text-align: center;
     }
-    .game {
-      position: relative;
-      width: 400px;
-      height: 600px;
-      background: url(https://sdmntprukwest.oaiusercontent.com/files/00000000-11b0-6243-86b6-bbf3270bb3df/raw?se=2025-09-12T17%3A38%3A12Z&sp=r&sv=2024-08-04&sr=b&scid=8d2bd3e3-8bc1-51e4-aff5-a06cfd926fd1&skoid=f71d6506-3cac-498e-b62a-67f9228033a9&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-09-12T16%3A36%3A50Z&ske=2025-09-13T16%3A36%3A50Z&sks=b&skv=2024-08-04&sig=3P/vionjcm5Fj9mlpUZTb62HHLQJGeWD4Hp7QDdmXzQ%3D) no-repeat center/cover;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.7);
-      overflow: hidden;
+
+    h1 {
+      color: orange;
+      text-shadow: 2px 2px 5px black;
     }
-    .target {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+
+    .coefficient {
+      font-size: 2rem;
+      margin: 20px 0;
+      color: #00ffb3;
       font-weight: bold;
-      color: #ff4747;
-      font-size: 18px;
-      display: none;
+      text-shadow: 2px 2px 5px black;
     }
+
     .kick-btn {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #ff4747;
-      border: none;
-      padding: 15px 40px;
-      font-size: 20px;
-      font-weight: bold;
+      background-color: #ff5722;
       color: white;
-      border-radius: 8px;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 20px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s;
     }
+
     .kick-btn:hover {
-      background: #ff2424;
+      background-color: #e64a19;
     }
-    .multiplier {
+
+    .target {
+      font-size: 1.5rem;
+      margin: 15px 0;
+      text-shadow: 1px 1px 4px black;
+    }
+
+    footer {
       position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 22px;
-      font-weight: bold;
-      background: rgba(0,0,0,0.5);
-      padding: 8px 16px;
-      border-radius: 8px;
+      bottom: 10px;
+      font-size: 14px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
-  <div class="game">
-    <div class="multiplier" id="multiplier">x2</div>
-    <div class="target" id="target"></div>
-    <button class="kick-btn" onclick="kick()">Kick</button>
-  </div>
+  <h1>Penalty Predictor ⚽</h1>
+  <div class="coefficient" id="coefficient">x1</div>
+  <div class="target" id="target">Click KICK to start</div>
+  <button class="kick-btn" onclick="nextKick()">KICK</button>
+
+  <footer>Made by HackerHouse • Bengaluru</footer>
 
   <script>
-    const multipliers = ["x2","x4","x12","x20","x32"];
-    let currentStep = 0;
-
-    // позиции 9 мишеней (примерные координаты для фона)
-    const positions = [
-      {top:"100px", left:"70px"},
-      {top:"100px", left:"170px"},
-      {top:"100px", left:"270px"},
-      {top:"200px", left:"70px"},
-      {top:"200px", left:"170px"},
-      {top:"200px", left:"270px"},
-      {top:"300px", left:"70px"},
-      {top:"300px", left:"170px"},
-      {top:"300px", left:"270px"},
+    const targets = [
+      "Top Left", "Top Center", "Top Right",
+      "Middle Left", "Middle Center", "Middle Right",
+      "Bottom Left", "Bottom Center", "Bottom Right"
     ];
+    const coefficients = [2, 4, 12, 20, 32];
+    let round = 0;
 
-    function kick(){
-      if(currentStep >= multipliers.length) return;
-
-      const target = document.getElementById("target");
-      const multiplierText = document.getElementById("multiplier");
-
-      // выбираем случайную мишень
-      const pos = positions[Math.floor(Math.random() * positions.length)];
-      target.style.top = pos.top;
-      target.style.left = pos.left;
-      target.style.display = "flex";
-      target.textContent = "🎯";
-
-      multiplierText.textContent = multipliers[currentStep];
-      currentStep++;
+    function nextKick() {
+      if (round < coefficients.length) {
+        document.getElementById("coefficient").textContent = "x" + coefficients[round];
+        const randomTarget = targets[Math.floor(Math.random() * targets.length)];
+        document.getElementById("target").textContent = "🎯 Shoot: " + randomTarget;
+        round++;
+      } else {
+        document.getElementById("target").textContent = "🏆 आप जीत गए! (You Win!)";
+      }
     }
   </script>
 </body>
